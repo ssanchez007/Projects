@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+# Autor: Silvana Sanchez
+# Script Python para trabajar con imagenes y contenedores Docker
+
+import os
+
+# Se declaran los colores para la terminal
+# Creo una funcion para definir los colores a usar en la salida de pantalla
+RED = '\033[31m'
+GREEN = '\033[32m'
+BLUE = '\033[34m'
+YELLOW = '\033[33m'
+WHITE = '\033[37m'
+CYAN = '\033[36m' 
+RESET = '\033[0m'
+
+# Se declaran las funciones a usar con las llamadas a las imagenes 
+def Buscar(name):
+    os.system("docker search "+ name)
+    return "" 
+
+
+def Listar_Apagados():
+    os.system("docker ps -f 'status=exited'")
+    return ""
+
+
+def Listar_Activos():
+    os.system("docker ps")
+    return ""
+
+
+def Encender(name):
+    os.system("docker start "+ name)
+    return ""
+
+def Apagar(name):
+    os.system("docker stop "+ name)
+    return ""
+
+# Declaro una variable estilo 'Here Documents' para presentar el menu en pantalla.
+menu = """
+
+*********************** MENU **********************
+
+1. Buscar Contenedor (Docker Hub)
+2. Listar Contenedores (Activos)
+3. Listar Contenedores (Apagados)
+4. Activar Contenedor 
+5. Detener Contenedor 
+
+***************************************************
+
+"""
+
+# Se imprime el menu previo usando las variables de color.
+print(YELLOW + menu + RESET)
+
+try:
+  opcion = int(input(YELLOW + "Selecciona Una De Las Opciones ::  "+ RESET))
+
+  if opcion <= 5 :
+    match opcion:
+      case 1:
+        respuesta=str(input(YELLOW + "Coloca el nombre del contenedor a buscar ::  "+ RESET))
+        if respuesta != "":
+          print(Buscar(respuesta))
+      case 2:
+        print(Listar_Activos())
+      case 3:
+        print(Listar_Apagados())
+      case 4:
+        print(YELLOW + "Listado De Imagenes Apagadas Disponibles A Encender:: "+ RESET)
+        os.system("docker ps -f 'status=exited' | awk '{ print $2 }' | tail -n +2")
+        print("\n")
+        respuesta1=str(input(YELLOW + "Coloca el nombre de la imagen a encender :: "+ RESET))
+        if respuesta1 != "":
+          print(Encender(respuesta1))
+          message = """
+          *********************************************************************
+                             LISTADO DE CONTENEDORES ACTIVOS 
+          ********************************************************************
+          """
+
+          print(message)
+          print(os.system("docker ps | grep "+ respuesta1))
+
+      case 5:
+          respuesta2=str(input(YELLOW + "Coloca el nombre de la imagen a apagar :: "+ RESET))
+          if respuesta2 != "":
+            print(Apagar(respuesta2))
+            message1 = """
+          *********************************************************************
+                             LISTADO DE CONTENEDORES APAGADO
+          ********************************************************************
+          """
+
+          print(message1)
+          print(os.system("docker ps | grep "+ respuesta2))
+
+  else:
+    print(YELLOW + "Debes colocar un numero entre 1 y 5" + RESET)
+
+except ValueError:
+  print(RED + "Debes colocar un numero!" + "\n"+ RESET)
+except:
+  pass
+
+exit()
