@@ -23,7 +23,6 @@ while True:
     if not usuario:
         continue
 
-
     if usuario.lower() in ('salir', 'exit', 'adios'):
         print("Nos vemos otro dia, adios\n")
         break
@@ -56,7 +55,6 @@ while True:
     # Guardo un historico del asistente, por si se me acaban los tokens
     try:
         asistente = response['choices'][0]['message']['content']
-       # response = response['choices'][0]['message']['content']
         mensajes.append( { "role": "assistant", "content": asistente })
 
     except:
