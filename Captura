@@ -1,0 +1,63 @@
+##########################################
+# Author: Silvana Sanchez                #
+##########################################
+
+# Script basico python para tomar capturas de un portal web y la pantalla de escritorio completa.
+
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+from dotenv import load_dotenv
+import os
+from PIL import ImageGrab
+import time
+import datetime
+
+# Para que no se sobreescriban las capturas, se procede a generar un nombre de fichero + fecha + hora + segundos 
+nombre_base = "captura"
+extension = ".png"
+suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+fichero = "_".join([nombre_base, suffix, extension])
+
+load_dotenv()
+
+def login_and_screenshot_selenium(url, username, password, screenshot_path="login_selenium.png"):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--window-size=1220,690")
+
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    try:
+        driver.get(url)
+
+        user_input = driver.find_element(By.NAME, "username")
+        pass_input = driver.find_element(By.NAME, "password")
+
+        user_input.send_keys(os.getenv("USUARIO"))
+        pass_input.send_keys(os.getenv("PASSWORD"))
+        pass_input.send_keys(Keys.RETURN)
+
+        # La carga del navegador es un poco lenta, por lo que esperamos 25 segundos antes de cerrar
+        WebDriverWait(driver, 25).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+
+        # Si solo quieres capturar la pantalla del navegador, puedes usar lo comentado abajo:
+        #driver.save_screenshot(screenshot_path)
+        #print(f"Screenshot saved to {screenshot_path}")
+
+        # Para capturar toda la pantalla del escritorio, incluyendo el navegador usamos:
+        screenshot = ImageGrab.grab()
+        screenshot.save(fichero)
+
+        driver.quit()
+
+    finally:
+        driver.quit()
+
+
